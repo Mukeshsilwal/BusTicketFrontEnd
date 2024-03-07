@@ -1,0 +1,263 @@
+/* BusList */
+.bus-list-main {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    justify-content:center;
+  }
+  
+  .bus-list-container {
+    display: flex;
+    flex-grow: 1;
+  }
+  
+  .bus-filters {
+    width: 25%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    /* border-right: 1px solid black; */
+    padding: 1em 0.5em;
+    background-color:  #5184AA;
+    margin:0.2em;
+  }
+  
+  .bus-filters select {
+    width: fit-content;
+  }
+  
+  .bus-details {
+    width: 80%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 1em 0.5em;
+  }
+  
+  .bus-detail {
+    display: flex;
+    width: 80%;
+    align-items: center;
+    justify-content: space-around;
+    border: 1px solid #a7a9ac;
+    padding: 1em;
+    margin: 0.1em;
+    cursor: pointer;
+  }
+  
+  .bus-detail-header {
+    display: flex;
+    width: 80%;
+    align-items: center;
+    justify-content: space-around;
+    border-top: 1px solid #a7a9ac;
+    /* border-: 1px solid #a7a9ac; */
+    padding: 1em;
+    margin: 0.1em;
+  }
+  
+  .bus-detail-header p {
+    width: 20%;
+  }
+  
+  .bus-detail p {
+    width: 20%;
+  }
+  
+  .bus-type {
+    font-size: smaller;
+  }
+  
+  .bus-list-pagination {
+    display: flex;
+    width: 80%;
+    flex-direction: row-reverse;
+  }
+  
+  .pagination-btn {
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: black;
+    color: white;
+    cursor: pointer;
+    border: 1px solid black;
+    margin-left:10px;
+    width:7em;
+  }
+  
+  .pagination-btn:hover {
+    background-color: #393c41;
+    color: white;
+  }
+  
+  .bus-filter-pagination {
+    display: flex;
+    width: 80%;
+    flex-direction: row-reverse;
+    opacity: 0;
+  }
+  
+  .filter-item {
+    border-top: 1px solid #a7a9ac;
+    padding: 1em;
+  }
+  
+
+  
+// td
+.ticket-details-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    /* justify-center:center; */
+    width: 100%;
+    height: 100%;
+  }
+  
+  .ticket-details-container h2 {
+    padding: 0.5em;
+    display: flex;
+    align-items: center;
+    justify-center: start;
+    width: 100%;
+    background-color: #5184AA;
+    color: white;
+    margin-bottom: 0.3em;
+  }
+  
+  .all-details {
+    display: flex;
+    flex-grow: 1;
+    width: 100%;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 2em;
+  }
+  
+  .left-details,
+  .right-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* border:1px solid red; */
+    height: 100%;
+  }
+  .left-details {
+    width: 40%;
+  }
+  
+  .left-details button {
+    background-color: black;
+    color: white;
+    font-weight: bold;
+    width: 100%;
+    padding: 1em;
+    margin:10px 0;
+    cursor:pointer;
+    border:none;
+  border-radius: 5px;
+  }
+  
+  .left-details button:hover {
+    background-color: lightgreen;
+  }
+  
+  .right-details {
+    width: 20%;
+  }
+  
+  .passenger-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    padding-left: 1em;
+  }
+  .passenger-details-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.1em;
+    width: 85%;
+  }
+  .passenger-details-item label {
+    font-weight: bold;
+  }
+  .passenger-details-item input {
+    margin: 10px 0;
+    padding: 0.4em;
+    width: 100%;
+    border:1px solid black;
+  }
+  .payment-details {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: flex-start;
+    padding: 1em;
+  }
+  .route-details {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: flex-start;
+    padding: 1em;
+  }
+  .seat-selection-div {
+    display:flex;
+    width:100%;
+    justify-content:space-around;
+}
+  .seat-selection {
+  }
+  .seats {
+    display: flex;
+    gap: 2px;
+    margin: 2px;
+  }
+  .seats-reverse {
+    display: flex;
+    flex-direction: row-reverse;
+    width: 334px;
+    height: 40px;
+    gap: 0.1em;
+    margin: 2px;
+  }
+  
+  .seat {
+    width: 40px;
+    height: 40px;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid red;
+    color: grey;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+  
+  .selected {
+    border: 1px solid black;
+    background-color: green;
+    color: white;
+  }
+  
+  .available {
+    border: 3px solid green;
+    color: black;
+    pointer-events: auto;
+    cursor: pointer;
+  }
+  
+  .seat-info {
+    display: flex;
+    flex-direction:column;
+    align-items: center;
+    margin-top: 10px;
+    gap: 10px;
+  }
+  

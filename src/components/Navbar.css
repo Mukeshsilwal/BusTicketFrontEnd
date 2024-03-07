@@ -1,0 +1,48 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #26465f;
+    color: white;
+  }
+  
+  .logo img {
+    height: 30px; /* Adjust as needed */
+  }
+
+  
+.logo {
+  animation: moveLogo 1.5s ease-out infinite;
+}
+
+@keyframes moveLogo {
+  0% {
+    transform: translateX(-15px);
+    opacity: 1;
+  }
+  60% {
+    transform: translateX(50px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(75px);
+    opacity: 0;
+  }
+}
+
+  
+  .nav-buttons button {
+    margin-left: 10px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: white;
+    color: black;
+    cursor: pointer;
+  }
+  
+  .nav-buttons button:hover {
+    background-color: #cfdaeb;
+  }
+  
