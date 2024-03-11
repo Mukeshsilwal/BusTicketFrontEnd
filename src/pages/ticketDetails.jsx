@@ -5,8 +5,12 @@ import SelectedBusContext from "../context/selectedbus";
 export default function TicketDetails() {
   const { selectedBus } = useContext(SelectedBusContext);
   console.log("selectedBus", selectedBus);
+  // const seatPrices = selectedBus.seats.map(seat => )
   const [selectedSeats, setSelectedSeats] = useState([]);
-  const [availableSeats, setAvailableSeats] = useState(["A16"]);
+  const [availableSeats, setAvailableSeats] = useState(
+    selectedBus.seats.map((seat) => seat.seatNumber)
+  );
+  console.log("availableSeats", availableSeats);
 
   function esewaPaymentCall() {
     const formData = {
@@ -47,6 +51,17 @@ export default function TicketDetails() {
 
     // if transaction succesful sed 2 reqs to backend
   }
+
+  function calcTotalCost() {
+    let totalC = 0;
+    for (const seat of selectedBus.seats) {
+      if (selectedSeats.includes(seat.seatNumber)) {
+        totalC += parseInt(seat.price);
+      }
+    }
+    return totalC;
+  }
+
   return (
     <div className="ticket-details-container">
       <NavigationBar />
@@ -88,6 +103,14 @@ export default function TicketDetails() {
                   }}
                 >
                   B2
+                  <br />
+                  {availableSeats.includes("B2") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "B2"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
                 <div
                   className={`seat${
@@ -104,6 +127,14 @@ export default function TicketDetails() {
                   }}
                 >
                   B4
+                  <br />
+                  {availableSeats.includes("B4") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "B4"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
                 <div
                   className={`seat${
@@ -120,6 +151,14 @@ export default function TicketDetails() {
                   }}
                 >
                   B6
+                  <br />
+                  {availableSeats.includes("B6") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "B6"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
                 <div
                   className={`seat${
@@ -136,6 +175,14 @@ export default function TicketDetails() {
                   }}
                 >
                   B8
+                  <br />
+                  {availableSeats.includes("B8") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "B8"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
                 <div
                   className={`seat${
@@ -152,6 +199,14 @@ export default function TicketDetails() {
                   }}
                 >
                   B10
+                  <br />
+                  {availableSeats.includes("B10") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "B10"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
                 <div
                   className={`seat${
@@ -168,6 +223,14 @@ export default function TicketDetails() {
                   }}
                 >
                   B12
+                  <br />
+                  {availableSeats.includes("B12") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "B12"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
                 <div
                   className={`seat${
@@ -184,6 +247,14 @@ export default function TicketDetails() {
                   }}
                 >
                   B14
+                  <br />
+                  {availableSeats.includes("B14") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "B14"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
                 <div
                   className={`seat${
@@ -200,6 +271,14 @@ export default function TicketDetails() {
                   }}
                 >
                   B16
+                  <br />
+                  {availableSeats.includes("B16") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "B16"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
               </div>
               <div className="seats">
@@ -218,6 +297,14 @@ export default function TicketDetails() {
                   }}
                 >
                   B1
+                  <br />
+                  {availableSeats.includes("B1") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "B1"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
                 <div
                   className={`seat${
@@ -234,6 +321,14 @@ export default function TicketDetails() {
                   }}
                 >
                   B3
+                  <br />
+                  {availableSeats.includes("B3") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "B3"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
                 <div
                   className={`seat${
@@ -250,6 +345,14 @@ export default function TicketDetails() {
                   }}
                 >
                   B5
+                  <br />
+                  {availableSeats.includes("B5") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "B5"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
                 <div
                   className={`seat${
@@ -266,6 +369,14 @@ export default function TicketDetails() {
                   }}
                 >
                   B7
+                  <br />
+                  {availableSeats.includes("B7") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "B7"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
                 <div
                   className={`seat${
@@ -282,6 +393,14 @@ export default function TicketDetails() {
                   }}
                 >
                   B9
+                  <br />
+                  {availableSeats.includes("B9") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "B9"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
                 <div
                   className={`seat${
@@ -298,6 +417,14 @@ export default function TicketDetails() {
                   }}
                 >
                   B11
+                  <br />
+                  {availableSeats.includes("B11") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "B11"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
                 <div
                   className={`seat${
@@ -314,6 +441,14 @@ export default function TicketDetails() {
                   }}
                 >
                   B13
+                  <br />
+                  {availableSeats.includes("B13") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "B13"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
                 <div
                   className={`seat${
@@ -330,6 +465,14 @@ export default function TicketDetails() {
                   }}
                 >
                   B15
+                  <br />
+                  {availableSeats.includes("B15") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "B15"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
               </div>
               <div className="seats-reverse">
@@ -348,6 +491,14 @@ export default function TicketDetails() {
                   }}
                 >
                   B17
+                  <br />
+                  {availableSeats.includes("B17") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "B17"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
               </div>
               <div className="seats">
@@ -366,6 +517,14 @@ export default function TicketDetails() {
                   }}
                 >
                   A2
+                  <br />
+                  {availableSeats.includes("A2") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "A2"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
                 <div
                   className={`seat${
@@ -382,6 +541,14 @@ export default function TicketDetails() {
                   }}
                 >
                   A4
+                  <br />
+                  {availableSeats.includes("A4") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "A4"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
                 <div
                   className={`seat${
@@ -398,6 +565,14 @@ export default function TicketDetails() {
                   }}
                 >
                   A6
+                  <br />
+                  {availableSeats.includes("A6") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "A6"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
                 <div
                   className={`seat${
@@ -414,6 +589,14 @@ export default function TicketDetails() {
                   }}
                 >
                   A8
+                  <br />
+                  {availableSeats.includes("A8") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "A8"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
                 <div
                   className={`seat${
@@ -430,6 +613,14 @@ export default function TicketDetails() {
                   }}
                 >
                   A10
+                  <br />
+                  {availableSeats.includes("A10") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "A10"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
                 <div
                   className={`seat${
@@ -446,6 +637,14 @@ export default function TicketDetails() {
                   }}
                 >
                   A12
+                  <br />
+                  {availableSeats.includes("A12") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "A12"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
                 <div
                   className={`seat${
@@ -462,6 +661,14 @@ export default function TicketDetails() {
                   }}
                 >
                   A14
+                  <br />
+                  {availableSeats.includes("A14") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "A14"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
                 <div
                   className={`seat${
@@ -478,6 +685,14 @@ export default function TicketDetails() {
                   }}
                 >
                   A16
+                  <br />
+                  {availableSeats.includes("A16") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "A16"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
               </div>
               <div className="seats">
@@ -496,6 +711,14 @@ export default function TicketDetails() {
                   }}
                 >
                   A1
+                  <br />
+                  {availableSeats.includes("A1") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "A1"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
                 <div
                   className={`seat${
@@ -512,6 +735,14 @@ export default function TicketDetails() {
                   }}
                 >
                   A3
+                  <br />
+                  {availableSeats.includes("A3") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "A3"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
                 <div
                   className={`seat${
@@ -528,6 +759,14 @@ export default function TicketDetails() {
                   }}
                 >
                   A5
+                  <br />
+                  {availableSeats.includes("A5") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "A5"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
                 <div
                   className={`seat${
@@ -544,6 +783,14 @@ export default function TicketDetails() {
                   }}
                 >
                   A7
+                  <br />
+                  {availableSeats.includes("A7") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "A7"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
                 <div
                   className={`seat${
@@ -560,6 +807,14 @@ export default function TicketDetails() {
                   }}
                 >
                   A9
+                  <br />
+                  {availableSeats.includes("A9") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "A9"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
                 <div
                   className={`seat${
@@ -576,6 +831,14 @@ export default function TicketDetails() {
                   }}
                 >
                   A11
+                  <br />
+                  {availableSeats.includes("A11") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "A11"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
                 <div
                   className={`seat${
@@ -592,6 +855,14 @@ export default function TicketDetails() {
                   }}
                 >
                   A13
+                  <br />
+                  {availableSeats.includes("A13") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "A13"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
                 <div
                   className={`seat${
@@ -608,6 +879,14 @@ export default function TicketDetails() {
                   }}
                 >
                   A15
+                  <br />
+                  {availableSeats.includes("A15") && (
+                    <span>
+                      {selectedBus.seats.find(
+                        (seat) => seat.seatNumber === "A15"
+                      )?.price ?? ""}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -637,10 +916,7 @@ export default function TicketDetails() {
 
           <h2>Payment Details</h2>
           <div className="payment-details">
-            <p>Per Ticket: {parseInt(selectedBus.price)}</p>
-            <p>
-              Total Cost: {parseInt(selectedBus.price) * selectedSeats.length}
-            </p>
+            <p>Total Cost: {calcTotalCost()}</p>
           </div>
         </div>
       </div>

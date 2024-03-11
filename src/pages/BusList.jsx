@@ -33,7 +33,7 @@ const BusList = () => {
 
   const filteredBuses = buses.filter((bus) => {
     return (
-      (filters.maxPrice === "" || bus.price <= filters.maxPrice) &&
+      (filters.maxPrice === "" || (bus.price ?? 0) <= filters.maxPrice) &&
       (filters.busType === "" || bus.busType === filters.busType)
     );
   });

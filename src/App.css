@@ -240,6 +240,11 @@
     pointer-events: none;
     cursor: not-allowed;
   }
+
+  .seat span{
+    font-size:smaller;
+  }
+  
   
   .selected {
     border: 1px solid black;
@@ -252,6 +257,8 @@
     color: black;
     pointer-events: auto;
     cursor: pointer;
+    display:flex;
+    flex-direction:column;
   }
   
   .seat-info {

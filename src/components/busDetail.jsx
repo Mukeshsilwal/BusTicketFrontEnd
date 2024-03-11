@@ -22,7 +22,7 @@ const BusDetail = ({ bus }) => {
       <p className="bus-departure-time">
         <b>{new Date(bus.departureDateTime).toLocaleTimeString()}</b>
       </p>
-      <p className="bus-price">Rs.{bus.price}/-</p>
+      <p className="bus-price">Rs.{bus.price ?? 0}/-</p>
     </div>
   );
 };
