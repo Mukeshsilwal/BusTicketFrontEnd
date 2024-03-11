@@ -1,22 +1,12 @@
 import { useContext, useState } from "react";
 import NavigationBar from "../components/Navbar";
 import SelectedBusContext from "../context/selectedbus";
-import crypto from "crypto";
 
 export default function TicketDetails() {
   const { selectedBus } = useContext(SelectedBusContext);
   console.log("selectedBus", selectedBus);
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [availableSeats, setAvailableSeats] = useState(["A16"]);
-
-  function createSig(str) {
-    const secret = "8gBm/:&EnhH.1/q";
-    const hmac = crypto.createHmac("sha256", secret);
-    hmac.update(str);
-
-    const hashInBase64 = hmac.digest("base64");
-    return hashInBase64;
-  }
 
   function esewaPaymentCall() {
     const formData = {
@@ -25,11 +15,9 @@ export default function TicketDetails() {
       product_delivery_charge: "0",
       product_service_charge: "0",
       product_code: "EPAYTEST",
-      signature: createSig(
-        `total_amount=${
-          parseInt(selectedBus.price) * selectedSeats.length
-        },transaction_uuid=ab14a8f2b02c3,product_code=EPAYTEST`
-      ),
+      signature: `total_amount=${
+        parseInt(selectedBus.price) * selectedSeats.length
+      },transaction_uuid=ab14a8f2b02c3,product_code=EPAYTEST`,
       signed_field_names: "total_amount,transaction_uuid,product_code",
       success_url: "https://esewa.com.np",
       tax_amount: -"0",
