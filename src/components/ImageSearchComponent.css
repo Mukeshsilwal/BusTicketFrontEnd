@@ -13,13 +13,9 @@
   height: 100%;
 }
 
-.search-container {
-  width: 40%;
-  background-color: #5184AA;
-}
 
 .search-container input,
-select {
+ {
   width: 70%; /* Adjust width as needed */
   margin: 10px;
   padding: 5px;

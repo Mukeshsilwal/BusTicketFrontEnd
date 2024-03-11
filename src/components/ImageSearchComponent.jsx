@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ImageSearchComponent.css";
+import axiosInstance from "../functions";
+import BusListContext from "../context/busdetails";
 
 const nepalCities = [
   "Kathmandu",
@@ -21,6 +23,7 @@ const ImageSearchComponent = () => {
   const [source, setSource] = useState("");
   const [destination, setDestination] = useState("");
   const [date, setDate] = useState("");
+  const { setBusList } = useContext(BusListContext);
 
   const handleSourceChange = (e) => {
     setSource(e.target.value);
@@ -30,14 +33,17 @@ const ImageSearchComponent = () => {
     setDestination(e.target.value);
   };
 
-  function taketoAnotherPage() {
-    navigate("/buslist");
-  }
-
-  const handleSearch = () => {
-    taketoAnotherPage();
-    const apiUrl = `https://example.com/api/search?source=${source}&destination=${destination}&date=${date}`;
-    console.log("API Request:", apiUrl);
+  const handleSearch = async () => {
+    // taketoAnotherPage();
+    const response = await axiosInstance.get(
+      `http://localhost:8089/bus/search?source=${source}&destination=${destination}`
+    );
+    if (response.data) {
+      console.log(response.data);
+      setBusList(response.data);
+      navigate("/buslist");
+      // return response.data;
+    }
   };
 
   // Get today's date in the format YYYY-MM-DD
@@ -46,7 +52,10 @@ const ImageSearchComponent = () => {
   return (
     <div className="flex h-full pt-8 bg-cyan-700">
       <div className="image-container">
-        <img src="https://img.freepik.com/premium-vector/simple-buss-traansportation-logo-design_569344-386.jpg?w=2000" alt="Image" />
+        <img
+          src="https://img.freepik.com/premium-vector/simple-buss-traansportation-logo-design_569344-386.jpg?w=2000"
+          alt="Image"
+        />
       </div>
       <div className="w-2/5 flex-col self-center justify-self-center">
         <select onChange={handleSourceChange} className="w-7/10 m-2 p-2">
@@ -77,9 +86,12 @@ const ImageSearchComponent = () => {
           min={today}
           className="block w-7/10 m-2 p-2"
         />
-        <button onClick={handleSearch}
-         className="px-5 py-3 border-none bg-black text-white cursor-pointer"
-        >Search</button>
+        <button
+          onClick={handleSearch}
+          className="px-5 py-3 border-none bg-black text-white cursor-pointer"
+        >
+          Search
+        </button>
       </div>
     </div>
   );

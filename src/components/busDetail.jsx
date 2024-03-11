@@ -1,10 +1,14 @@
 import PropTypes from "prop-types";
+import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import SelectedBusContext from "../context/selectedbus";
 
 const BusDetail = ({ bus }) => {
   let navigate = useNavigate();
+  const { setSelectedBus } = useContext(SelectedBusContext);
 
   function taketoAnotherPage() {
+    setSelectedBus(bus);
     navigate("/ticket-details");
   }
   return (

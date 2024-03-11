@@ -1,34 +1,88 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import NavigationBar from "../components/Navbar";
+import SelectedBusContext from "../context/selectedbus";
+import crypto from "crypto";
 
 export default function TicketDetails() {
+  const { selectedBus } = useContext(SelectedBusContext);
+  console.log("selectedBus", selectedBus);
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [availableSeats, setAvailableSeats] = useState(["A16"]);
+
+  function createSig(str) {
+    const secret = "8gBm/:&EnhH.1/q";
+    const hmac = crypto.createHmac("sha256", secret);
+    hmac.update(str);
+
+    const hashInBase64 = hmac.digest("base64");
+    return hashInBase64;
+  }
+
+  function esewaPaymentCall() {
+    const formData = {
+      amount: parseInt(selectedBus.price) * selectedSeats.length,
+      failure_url: "https://google.com",
+      product_delivery_charge: "0",
+      product_service_charge: "0",
+      product_code: "EPAYTEST",
+      signature: createSig(
+        `total_amount=${
+          parseInt(selectedBus.price) * selectedSeats.length
+        },transaction_uuid=ab14a8f2b02c3,product_code=EPAYTEST`
+      ),
+      signed_field_names: "total_amount,transaction_uuid,product_code",
+      success_url: "https://esewa.com.np",
+      tax_amount: -"0",
+      total_amount: parseInt(selectedBus.price) * selectedSeats.length,
+      transaction_uuid: "ab14a8f2b02c3",
+    };
+    const path = "https://rc-epay.esewa.com.np/api/epay/main/v2/form";
+
+    const form = document.createElement("form");
+    form.setAttribute("method", "POST");
+    form.setAttribute("action", path);
+
+    for (const key in formData) {
+      const hiddenField = document.createElement("input");
+      hiddenField.setAttribute("type", "hidden");
+      hiddenField.setAttribute("name", key);
+      hiddenField.setAttribute("value", formData[key]);
+      form.appendChild(hiddenField);
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+  }
+
+  function bookTicket() {
+    const res = esewaPaymentCall();
+
+    // if transaction succesful sed 2 reqs to backend
+  }
   return (
-   
-      <div className="ticket-details-container">
-        <NavigationBar />
+    <div className="ticket-details-container">
+      <NavigationBar />
 
-        <div className="all-details">
-         <div className="left-details">
+      <div className="all-details">
+        <div className="left-details">
           <h2>Passenger Details</h2>
-            <div className="passenger-details">
-              <div className="passenger-details-item">
-                <label htmlFor="passenger-name">Passenger Name</label>
-                <input type="text" name="passenger-name" />
-              </div>
-              <div className="passenger-details-item">
-                <label htmlFor="passenger-email">Email</label>
-                <input type="text" name="passenger-email" />
-              </div>
-              <div className="passenger-details-item">
-                <label htmlFor="passenger-contact">Contact</label>
-                <input type="number" name="passenger-contact" />
-              </div>
+          <div className="passenger-details">
+            <div className="passenger-details-item">
+              <label htmlFor="passenger-name">Passenger Name</label>
+              <input type="text" name="passenger-name" />
             </div>
+            <div className="passenger-details-item">
+              <label htmlFor="passenger-email">Email</label>
+              <input type="text" name="passenger-email" />
+            </div>
+            <div className="passenger-details-item">
+              <label htmlFor="passenger-contact">Contact</label>
+              <input type="number" name="passenger-contact" />
+            </div>
+          </div>
 
-            <h2>Select Seats</h2>
-            <div className="seat-selection-div">
+          <h2>Select Seats</h2>
+          <div className="seat-selection-div">
             <div className="seat-selection">
               <div className="seats">
                 <div
@@ -568,41 +622,40 @@ export default function TicketDetails() {
                   A15
                 </div>
               </div>
-
             </div>
 
             <div className="seat-info">
-                <label htmlFor="available-seat">Available</label>
-                <div className="seat available" name="available-seat"></div>
-                <label htmlFor="booked-seat">Booked</label>
-                <div className="seat" name="booked-seat"></div>
-              </div>
-            </div>
-
-            <button>Proceed to payment</button>
-          </div>
-
-          <div className="right-details">
-          <h2>Route Details</h2>
-            <div className="route-details">
-             
-              <p>Route: </p>
-              <p>Date: </p>
-              <p>Seats: </p>
-              <p>Travel: </p>
-            </div>
-
-            <h2>Payment Details</h2>
-            <div className="payment-details">
-             
-              <p>Per Ticket: </p>
-              <p>Total Cost: </p>
+              <label htmlFor="available-seat">Available</label>
+              <div className="seat available" name="available-seat"></div>
+              <label htmlFor="booked-seat">Booked</label>
+              <div className="seat" name="booked-seat"></div>
             </div>
           </div>
+
+          <button onClick={bookTicket}>Pay with esewa</button>
         </div>
 
-      
+        <div className="right-details">
+          <h2>Route Details</h2>
+          <div className="route-details">
+            <p>
+              Route: {selectedBus.route12.sourceBusStop.name} -{" "}
+              {selectedBus.route12.destinationBusStop.name}
+            </p>
+            <p>Date: {}</p>
+            <p>Seats: {selectedSeats.join(",")}</p>
+            <p>Travel: {selectedBus.busName}</p>
+          </div>
+
+          <h2>Payment Details</h2>
+          <div className="payment-details">
+            <p>Per Ticket: {parseInt(selectedBus.price)}</p>
+            <p>
+              Total Cost: {parseInt(selectedBus.price) * selectedSeats.length}
+            </p>
+          </div>
+        </div>
       </div>
- 
+    </div>
   );
 }
