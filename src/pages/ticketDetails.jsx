@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import NavigationBar from "../components/Navbar";
 import SelectedBusContext from "../context/selectedbus";
 
@@ -10,23 +10,35 @@ export default function TicketDetails() {
   const [availableSeats, setAvailableSeats] = useState(
     selectedBus.seats.map((seat) => seat.seatNumber)
   );
+  const [totalCost, setTotalCost] = useState(0);
   console.log("availableSeats", availableSeats);
 
-  function esewaPaymentCall() {
+  function generateRandomId() {
+    const idLength = 10;
+    const characters = "0123456789";
+    let randomId = "";
+
+    for (let i = 0; i < idLength; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      randomId += characters[randomIndex];
+    }
+
+    return randomId;
+  }
+  function esewaPaymentCall(sig, tid) {
     const formData = {
-      amount: parseInt(selectedBus.price) * selectedSeats.length,
-      failure_url: "https://google.com",
+      amount: totalCost,
+      failure_url: "https://developer.esewa.com.np/failure",
       product_delivery_charge: "0",
       product_service_charge: "0",
       product_code: "EPAYTEST",
-      signature: `total_amount=${
-        parseInt(selectedBus.price) * selectedSeats.length
-      },transaction_uuid=ab14a8f2b02c3,product_code=EPAYTEST`,
+      signature: sig,
       signed_field_names: "total_amount,transaction_uuid,product_code",
-      success_url: "https://esewa.com.np",
-      tax_amount: -"0",
-      total_amount: parseInt(selectedBus.price) * selectedSeats.length,
-      transaction_uuid: "ab14a8f2b02c3",
+      success_url: "https://developer.esewa.com.np/success",
+      tax_amount: "0",
+      total_amount: totalCost,
+      transaction_uuid: tid,
+      secret: "8gBm/:&EnhH.1/q",
     };
     const path = "https://rc-epay.esewa.com.np/api/epay/main/v2/form";
 
@@ -46,10 +58,18 @@ export default function TicketDetails() {
     form.submit();
   }
 
-  function bookTicket() {
-    const res = esewaPaymentCall();
-
-    // if transaction succesful sed 2 reqs to backend
+  async function bookTicket() {
+    // const amt = calcTotalCost();
+    const tid = generateRandomId();
+    const response = await fetch(
+      `http://localhost:8089/secret/generateSignature?total_cost=${totalCost}&transaction_uuid=${tid}`
+    );
+    let sig = "";
+    if (response) {
+      sig = await response.text();
+      esewaPaymentCall(sig, tid);
+    }
+    // esewaPaymentCall();
   }
 
   function calcTotalCost() {
@@ -59,8 +79,11 @@ export default function TicketDetails() {
         totalC += parseInt(seat.price);
       }
     }
-    return totalC;
+    setTotalCost(totalC);
   }
+  useEffect(() => {
+    calcTotalCost();
+  }, [selectedSeats]);
 
   return (
     <div className="ticket-details-container">
@@ -916,7 +939,7 @@ export default function TicketDetails() {
 
           <h2>Payment Details</h2>
           <div className="payment-details">
-            <p>Total Cost: {calcTotalCost()}</p>
+            <p>Total Cost: {totalCost}</p>
           </div>
         </div>
       </div>
