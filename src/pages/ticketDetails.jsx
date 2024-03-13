@@ -7,6 +7,22 @@ export default function TicketDetails() {
   console.log("selectedBus", selectedBus);
   // const seatPrices = selectedBus.seats.map(seat => )
   const [selectedSeats, setSelectedSeats] = useState([]);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [contact, setContact] = useState("");
+
+  const handleNameChange = (e) => {
+    setName(e.target.value);
+  };
+
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+  };
+
+  const handleContactChange = (e) => {
+    setContact(e.target.value);
+  };
+
   const [availableSeats, setAvailableSeats] = useState(
     selectedBus.seats
       .filter((seat) => !seat.reserved)
@@ -27,16 +43,16 @@ export default function TicketDetails() {
 
     return randomId;
   }
-  function esewaPaymentCall(sig, tid) {
+  async function esewaPaymentCall(sig, tid) {
     const formData = {
       amount: totalCost,
-      failure_url: "https://developer.esewa.com.np/failure",
+      failure_url: "http://localhost:3000/booking-failed",
       product_delivery_charge: "0",
       product_service_charge: "0",
       product_code: "EPAYTEST",
       signature: sig,
       signed_field_names: "total_amount,transaction_uuid,product_code",
-      success_url: "https://developer.esewa.com.np/success",
+      success_url: "http://localhost:3000/ticket-confirm",
       tax_amount: "0",
       total_amount: totalCost,
       transaction_uuid: tid,
@@ -57,10 +73,90 @@ export default function TicketDetails() {
     }
 
     document.body.appendChild(form);
+
+    // generate booking id
+    let bookingId = "";
+    const bookingRes = await fetch("http://localhost:8089/booking/post", {
+      body: JSON.stringify({
+        fullName: name,
+        email,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+    });
+
+    if (bookingRes.ok) {
+      const data = await bookingRes.json();
+      // console.log(data);
+      bookingId = data.bookingId;
+      localStorage.setItem("bookingRes", JSON.stringify(data))
+    }
+
+    // send backend request to create ticket for all seats
+    for (const seatName of selectedSeats) {
+      const seatId = selectedBus.seats.find(
+        (seat) => seat.seatNumber === seatName
+      ).id;
+
+      // request to create ticket for seat
+      const seatRes = await fetch(
+        `http://localhost:8089/tickets/seat/${seatId}/book/${bookingId}`,
+        {
+          body: JSON.stringify({}),
+          headers: {
+            "Content-Type": "application/json",
+          },
+          method: "POST",
+        }
+      );
+
+      if (seatRes.ok) {
+        const data = await seatRes.json();
+        localStorage.setItem("seatRes", JSON.stringify(data))
+        console.log(data);
+      }
+
+      // confirm booking
+      const confirmRes = await fetch(
+        `http://localhost:8089/bookSeats/${seatId}`,
+        {
+          body: JSON.stringify({}),
+          headers: {
+            "Content-Type": "application/json",
+          },
+          method: "POST",
+        }
+      );
+
+      
+      if (confirmRes.ok) {
+        const data = await confirmRes.json();
+        console.log(data);
+      }
+    }
+
     form.submit();
   }
 
   async function bookTicket() {
+    if (!selectedSeats.length) {
+      alert("No seat selected!");
+      return;
+    }
+    if (!name) {
+      alert("Enter passenger name!");
+      return;
+    }
+    if (!email) {
+      alert("Enter passenger email!");
+      return;
+    }
+    if (!contact) {
+      alert("Enter passenger contact number!");
+      return;
+    }
     // const amt = calcTotalCost();
     const tid = generateRandomId();
     const response = await fetch(
@@ -69,7 +165,7 @@ export default function TicketDetails() {
     let sig = "";
     if (response) {
       sig = await response.text();
-      esewaPaymentCall(sig, tid);
+      await esewaPaymentCall(sig, tid);
     }
     // esewaPaymentCall();
   }
@@ -97,15 +193,27 @@ export default function TicketDetails() {
           <div className="passenger-details">
             <div className="passenger-details-item">
               <label htmlFor="passenger-name">Passenger Name</label>
-              <input type="text" name="passenger-name" />
+              <input
+                type="text"
+                name="passenger-name"
+                onChange={handleNameChange}
+              />
             </div>
             <div className="passenger-details-item">
               <label htmlFor="passenger-email">Email</label>
-              <input type="text" name="passenger-email" />
+              <input
+                type="text"
+                name="passenger-email"
+                onChange={handleEmailChange}
+              />
             </div>
             <div className="passenger-details-item">
               <label htmlFor="passenger-contact">Contact</label>
-              <input type="number" name="passenger-contact" />
+              <input
+                type="number"
+                name="passenger-contact"
+                onChange={handleContactChange}
+              />
             </div>
           </div>
 
@@ -934,7 +1042,10 @@ export default function TicketDetails() {
               Route: {selectedBus.route12.sourceBusStop.name} -{" "}
               {selectedBus.route12.destinationBusStop.name}
             </p>
-            <p>Date: {}</p>
+            <p>
+              Date:{" "}
+              {new Date(selectedBus.departureDateTime).toLocaleDateString()}
+            </p>
             <p>Seats: {selectedSeats.join(",")}</p>
             <p>Travel: {selectedBus.busName}</p>
           </div>
