@@ -32,8 +32,12 @@ const BusList = () => {
   };
 
   const filteredBuses = buses.filter((bus) => {
+    const avPrice =
+      bus.seats.reduce((acc, curr) => {
+        return acc + curr.price;
+      }, 0) / bus.seats.length;
     return (
-      (filters.maxPrice === "" || (bus.price ?? 0) <= filters.maxPrice) &&
+      (filters.maxPrice === "" || (avPrice ?? 0) <= filters.maxPrice) &&
       (filters.busType === "" || bus.busType === filters.busType)
     );
   });
@@ -55,7 +59,7 @@ const BusList = () => {
             <button className="pagination-btn">Previous</button>
           </div>
           <div className="filter-item">
-            <label>Max Price:</label>
+            <label>Max Price </label>
             <input
               type="number"
               name="maxPrice"
@@ -65,7 +69,7 @@ const BusList = () => {
           </div>
 
           <div className="filter-item">
-            <label>Bus Type:</label>
+            <label>Bus Type </label>
             <select
               name="busType"
               value={filters.busType}
