@@ -40,6 +40,14 @@ const ImageSearchComponent = () => {
     );
     if (response.data) {
       console.log(response.data);
+      localStorage.setItem(
+        "searchDetails",
+        JSON.stringify({ source, destination, date })
+      );
+      localStorage.setItem(
+        "busListDetails",
+        JSON.stringify({ busList: response.data })
+      );
       setBusList(response.data);
       navigate("/buslist");
       // return response.data;

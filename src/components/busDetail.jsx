@@ -8,6 +8,13 @@ const BusDetail = ({ bus }) => {
   const { setSelectedBus } = useContext(SelectedBusContext);
 
   function taketoAnotherPage() {
+    localStorage.setItem(
+      "busListDetails",
+      JSON.stringify({
+        busList: JSON.parse(localStorage.getItem("busListDetails")).busList,
+        selectedBus: bus,
+      })
+    );
     setSelectedBus(bus);
     navigate("/ticket-details");
   }
@@ -22,7 +29,13 @@ const BusDetail = ({ bus }) => {
       <p className="bus-departure-time">
         <b>{new Date(bus.departureDateTime).toLocaleTimeString()}</b>
       </p>
-      <p className="bus-price">Rs.{bus.price ?? 0}/-</p>
+      <p className="bus-price">
+        Rs.
+        {bus.seats.reduce((acc, curr) => {
+          return acc + curr.price;
+        }, 0) / bus.seats.length ?? 0}
+        /-
+      </p>
     </div>
   );
 };
