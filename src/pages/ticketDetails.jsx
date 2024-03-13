@@ -8,7 +8,9 @@ export default function TicketDetails() {
   // const seatPrices = selectedBus.seats.map(seat => )
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [availableSeats, setAvailableSeats] = useState(
-    selectedBus.seats.map((seat) => seat.seatNumber)
+    selectedBus.seats
+      .filter((seat) => !seat.reserved)
+      .map((seat) => seat.seatNumber)
   );
   const [totalCost, setTotalCost] = useState(0);
   console.log("availableSeats", availableSeats);
