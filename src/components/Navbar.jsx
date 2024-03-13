@@ -12,6 +12,7 @@ const NavigationBar = () => {
         <img src="./bus.svg" alt="Logo" />
       </div>
       {page === "admin" && <Navigate to={"/admin/login"} />}
+      {page === "homepage" && <Navigate to={"/"} />}
       <div className="nav-buttons">
         <button
           onClick={() => {
@@ -20,7 +21,11 @@ const NavigationBar = () => {
         >
           Admin Login
         </button>
-        <button>Button 2</button>
+        <button
+        onClick={() => {
+          setPage("homepage");
+        }}
+        >HomePage</button>
         <button>Button 3</button>
       </div>
     </div>
