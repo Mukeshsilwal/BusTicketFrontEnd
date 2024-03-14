@@ -5,9 +5,12 @@ const TicketConfirmed = () => {
   const [pdfUrl, setPdfUrl] = useState(null);
 
   async function fetchPdf() {
+    const ticketId = JSON.parse(localStorage.getItem("seatRes"));
+    console.log(ticketId);
     try {
       const response = await fetch(
-        "http://localhost:8089/tickets/generate?ticketId=1"
+        "http://localhost:8089/tickets/generate?ticketId=" +
+          ticketId.ticketNo
       );
       if (!response.ok) {
         throw new Error("Failed to fetch PDF");
