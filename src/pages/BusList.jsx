@@ -32,10 +32,11 @@ const BusList = () => {
   };
 
   const filteredBuses = buses.filter((bus) => {
-    const avPrice =
+    const avPrice = bus.seats.length > 0 ? 
       bus.seats.reduce((acc, curr) => {
         return acc + curr.price;
-      }, 0) / bus.seats.length;
+      }, 0) / bus.seats.length 
+      : 0;
     return (
       (filters.maxPrice === "" || (avPrice ?? 0) <= filters.maxPrice) &&
       (filters.busType === "" || bus.busType === filters.busType)
