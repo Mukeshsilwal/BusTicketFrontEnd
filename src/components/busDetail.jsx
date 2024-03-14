@@ -31,9 +31,9 @@ const BusDetail = ({ bus }) => {
       </p>
       <p className="bus-price">
         Rs.
-        {bus.seats.reduce((acc, curr) => {
+        {bus.seats.length>0?bus.seats.reduce((acc, curr) => {
           return acc + curr.price;
-        }, 0) / bus.seats.length ?? 0}
+        }, 0) / bus.seats.length?? 0 : 0}
         /-
       </p>
     </div>
