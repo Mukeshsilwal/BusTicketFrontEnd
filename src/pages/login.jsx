@@ -1,28 +1,48 @@
-import { useFormik } from "formik";
-import React from "react";
+import React, { useState } from "react";
 import { toast } from "react-toastify";
-import { Link } from "react-router-dom";
-import { loginByData } from "../functions/auth/login";
-import { loginRegisterValidation } from "../validations/auth.validations";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Login() {
-  const initialValues = {
-    email: "",
-    password: "",
-  };
-  const { values, errors, touched, handleBlur, handleSubmit, handleChange } =
-    useFormik({
-      initialValues,
-      validationSchema: loginRegisterValidation,
-      onSubmit: async (values, action) => {
-        const { ...data } = values;
-        const response = await loginByData(data);
-        if (response) {
-          toast.success("User is Logged Sucessfully.");
-          action.resetForm();
-        }
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  function handleEmailChange(e) {
+    setEmail(e.target.value);
+  }
+
+  function handlePasswordChange(e) {
+    setPassword(e.target.value);
+  }
+
+  async function handleLogin() {
+    if (email.length === 0) {
+      toast.error("Enter email");
+      return;
+    }
+    if (password.length === 0) {
+      toast.error("Enter password");
+      return;
+    }
+    console.log(email, password);
+    const loginUrl = "http://localhost:8089/auth/login";
+    const loginRes = await fetch(loginUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
+      body: JSON.stringify({ email, password }),
     });
+    console.log(loginRes);
+    if (loginRes.ok) {
+      const data = await loginRes.json();
+      const token = data.token;
+      localStorage.setItem("token", token);
+      navigate('/admin/panel')
+    } else {
+      toast.error("Invalid email or password");
+    }
+  }
 
   return (
     <div className="flex h-screen">
@@ -47,60 +67,45 @@ export default function Login() {
           <div className="mt-4 text-sm text-gray-600 text-center">
             <p>Log In with email</p>
           </div>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label
-                for="email"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Email
-              </label>
-              <input
-                type="text"
-                id="email"
-                value={values.email}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                name="email"
-                className="mt-1 p-2 w-full border rounded-md focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-300"
-              />
-              {errors.email && touched.email ? (
-                <span className="font-light text-red-400 mb-8">
-                  {errors.email}
-                </span>
-              ) : null}
-            </div>
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Email
+            </label>
+            <input
+              type="text"
+              id="email"
+              onChange={handleEmailChange}
+              name="email"
+              className="mt-1 p-2 w-full border rounded-md focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-300"
+            />
+          </div>
 
-            <div>
-              <label
-                for="password"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Password
-              </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                onChange={handleChange}
-                onBlur={handleBlur}
-                className="mt-1 p-2 w-full border rounded-md focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-300"
-              />
-              {errors.password && touched.password ? (
-                <span className="font-light text-red-400 mb-8">
-                  {errors.password}
-                </span>
-              ) : null}
-            </div>
-            <div>
-              <button
-                type="submit"
-                className="w-full bg-black text-white p-2 rounded-md hover:bg-gray-800 focus:outline-none focus:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors duration-300"
-              >
-                Log In
-              </button>
-            </div>
-          </form>
+          <div>
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Password
+            </label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              onChange={handlePasswordChange}
+              className="mt-1 p-2 w-full border rounded-md focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-300"
+            />
+          </div>
+          <div>
+            <button
+              onClick={handleLogin}
+              className="w-full bg-black text-white p-2 rounded-md hover:bg-gray-800 focus:outline-none focus:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors duration-300"
+            >
+              Log In
+            </button>
+          </div>
           <div className="mt-4 text-sm text-gray-600 text-center">
             <p>
               Not registered yet?
