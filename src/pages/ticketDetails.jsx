@@ -94,6 +94,7 @@ export default function TicketDetails() {
       localStorage.setItem("bookingRes", JSON.stringify(data))
     }
 
+    localStorage.setItem("selectedSeats", JSON.stringify(selectedSeats));
     // send backend request to create ticket for all seats
     for (const seatName of selectedSeats) {
       const seatId = selectedBus.seats.find(
@@ -165,6 +166,7 @@ export default function TicketDetails() {
     let sig = "";
     if (response) {
       sig = await response.text();
+      localStorage.setItem("email", email);
       await esewaPaymentCall(sig, tid);
     }
     // esewaPaymentCall();

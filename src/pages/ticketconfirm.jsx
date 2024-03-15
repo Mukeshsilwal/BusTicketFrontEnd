@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
 import NavigationBar from "../components/Navbar";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const TicketConfirmed = () => {
   const [pdfUrl, setPdfUrl] = useState(null);
+  const navigate = useNavigate();
 
   async function fetchPdf() {
     const ticketId = JSON.parse(localStorage.getItem("seatRes"));
     console.log(ticketId);
     try {
       const response = await fetch(
-        "http://localhost:8089/tickets/generate?ticketId=" +
-          ticketId.ticketNo
+        "http://localhost:8089/tickets/generate?ticketId=" + ticketId.ticketNo
       );
       if (!response.ok) {
         throw new Error("Failed to fetch PDF");
@@ -25,6 +27,27 @@ const TicketConfirmed = () => {
     }
   }
 
+  async function cancelTicket() {
+    const seatId = JSON.parse(localStorage.getItem("selectedSeats"))[0].id;
+    const email = localStorage.getItem("email");
+    const ticketId = JSON.parse(localStorage.getItem("seatRes"));
+    console.log(seatId);
+    try {
+      const response = await fetch(
+        `http://localhost:8089/bookSeats/${seatId}?email=${email}&ticketNo=${ticketId}`,
+        {
+          method: "DELETE",
+        }
+      );
+      if(response.ok){
+        toast.success("Ticket Cancelled.");
+        navigate("/")
+      }
+    } catch (error) {
+      console.error("Error fetching PDF:", error);
+    }
+  }
+
   return (
     <div className="flex-column h-screen w-screen overflow-auto pt-4 justify-center">
       <NavigationBar />
@@ -33,6 +56,11 @@ const TicketConfirmed = () => {
         {!pdfUrl && (
           <button onClick={fetchPdf} className="pagination-btn">
             View Ticket
+          </button>
+        )}
+        {pdfUrl && (
+          <button onClick={cancelTicket} className="pagination-btn">
+            Cancel Ticket
           </button>
         )}
         {pdfUrl && (
