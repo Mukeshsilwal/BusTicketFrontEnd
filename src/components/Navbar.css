@@ -2,30 +2,7 @@
     
   }
   
-  .logo img {
-    height: 30px; /* Adjust as needed */
-  }
-
   
-.logo {
-  animation: moveLogo 1.5s ease-out infinite;
-}
-
-@keyframes moveLogo {
-  0% {
-    transform: translateX(-15px);
-    opacity: 1;
-  }
-  60% {
-    transform: translateX(50px);
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(75px);
-    opacity: 0;
-  }
-}
-
   
   .nav-buttons button {
     margin-left: 10px;
