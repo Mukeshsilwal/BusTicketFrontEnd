@@ -24,7 +24,7 @@ const ImageSearchComponent = () => {
   const handleSearch = async () => {
     // taketoAnotherPage();
     const response = await axiosInstance.get(
-      `http://localhost:8089/bus/search?source=${source}&destination=${destination}`
+      `http://localhost:8089/bus/search?source=${source}&destination=${destination}&date=${date}`
     );
     if (response.data) {
       console.log(response.data);
