@@ -99,7 +99,7 @@ const BusList = () => {
             <p className="bus-name">Travels</p>
             <p className="bus-type">Bus Type</p>
             <p className="bus-departure-time">Departure</p>
-            <p className="bus-price">Fare</p>
+            <p className="bus-price">Starting Fare</p>
           </div>
           <ul>
             {currentBuses.map((bus) => (
