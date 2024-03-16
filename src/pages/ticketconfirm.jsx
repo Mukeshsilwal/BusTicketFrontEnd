@@ -28,9 +28,13 @@ const TicketConfirmed = () => {
   }
 
   async function cancelTicket() {
-    const seatId = JSON.parse(localStorage.getItem("selectedSeats"))[0].id;
+    const selectedBus = JSON.parse(localStorage.getItem("busListDetails")).selectedBus;
+    const seatNumber = JSON.parse(localStorage.getItem("selectedSeats"))[0];
+    const seatId = selectedBus.seats.find(
+      (seat) => seat.seatNumber === seatNumber
+    ).id;
     const email = localStorage.getItem("email");
-    const ticketId = JSON.parse(localStorage.getItem("seatRes"));
+    const ticketId = JSON.parse(localStorage.getItem("seatRes")).ticketNo;
     console.log(seatId);
     try {
       const response = await fetch(
@@ -39,9 +43,9 @@ const TicketConfirmed = () => {
           method: "DELETE",
         }
       );
-      if(response.ok){
+      if (response.ok) {
         toast.success("Ticket Cancelled.");
-        navigate("/")
+        navigate("/");
       }
     } catch (error) {
       console.error("Error fetching PDF:", error);
