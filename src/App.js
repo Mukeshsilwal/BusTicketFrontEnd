@@ -3,6 +3,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/login";
+import ChangePassword from "./pages/ChangePassword";
 import Register from "./pages/register";
 import HomePage from "./pages/Homepage";
 import BusList from "./pages/BusList";
@@ -27,6 +28,12 @@ function App() {
             element={<TicketDetails />}
             errorElement={<ErrorPage />}
           />
+              
+                  <Route path="/change-password" 
+                  element={<ChangePassword />} 
+                  errorElement={<ErrorPage />}
+
+                  />
           <Route
             path="/ticket-confirm"
             element={<TicketConfirmed />}

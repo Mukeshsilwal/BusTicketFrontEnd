@@ -7,8 +7,8 @@ import BusListContext from "../context/busdetails";
 const ImageSearchComponent = () => {
   let navigate = useNavigate();
 
-  const [source, setSource] = useState("");
-  const [destination, setDestination] = useState("");
+  const [source, setSource] = useState(null);
+  const [destination, setDestination] = useState(null);
   const [date, setDate] = useState("");
   const { setBusList } = useContext(BusListContext);
   const [busStops, setBusStops] = useState([]);

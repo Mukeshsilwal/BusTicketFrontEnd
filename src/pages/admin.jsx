@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 export function AdminPanel() {
-  // Get today's date in the format YYYY-MM-DD
   const today = new Date().toISOString().split("T")[0];
   const navigate = useNavigate();
 

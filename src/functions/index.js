@@ -1,6 +1,7 @@
 import axios from "axios";
+const singUp="http://localhost:8089/";
 const axiosInstance = axios.create({
-  baseURL: process.env.REACT_APP_BACKEND_URL,
+  baseURL: singUp,
 });
 
 export default axiosInstance;
