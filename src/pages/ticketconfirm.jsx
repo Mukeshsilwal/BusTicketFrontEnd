@@ -12,7 +12,7 @@ const TicketConfirmed = () => {
     console.log(ticketId);
     try {
       const response = await fetch(
-        "http://localhost:8089/tickets/generate?ticketId=" + ticketId.ticketNo
+        "https://busticketingsystem-1.onrender.com/tickets/generate?ticketId=" + ticketId.ticketNo
       );
       if (!response.ok) {
         throw new Error("Failed to fetch PDF");
@@ -38,7 +38,7 @@ const TicketConfirmed = () => {
     console.log(seatId);
     try {
       const response = await fetch(
-        `http://localhost:8089/bookSeats/${seatId}?email=${email}&ticketNo=${ticketId}`,
+        `https://busticketingsystem-1.onrender.com/bookSeats/${seatId}?email=${email}&ticketNo=${ticketId}`,
         {
           method: "DELETE",
         }

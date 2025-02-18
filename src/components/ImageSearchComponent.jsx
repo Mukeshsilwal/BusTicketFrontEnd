@@ -15,7 +15,7 @@ const ImageSearchComponent = () => {
   const handleSearch = async () => {
     try {
       const response = await axiosInstance.get(
-        `http://localhost:8089/bus/search?source=${source}&destination=${destination}&date=${date}`
+        `https://busticketingsystem-1.onrender.com/bus/search?source=${source}&destination=${destination}&date=${date}`
       );
       
       if (response.data) {
@@ -38,7 +38,7 @@ const ImageSearchComponent = () => {
   useEffect(() => {
     const getBusStops = async () => {
       try {
-        const response = await fetch("http://localhost:8089/busStop/get");
+        const response = await fetch("https://busticketingsystem-1.onrender.com/busStop/get");
         if (response.ok) {
           const data = await response.json();
           setBusStops(data);

@@ -76,7 +76,7 @@ export default function TicketDetails() {
 
     // generate booking id
     let bookingId = "";
-    const bookingRes = await fetch("http://localhost:8089/booking/post", {
+    const bookingRes = await fetch("https://busticketingsystem-1.onrender.com/booking/post", {
       body: JSON.stringify({
         fullName: name,
         email,
@@ -103,7 +103,7 @@ export default function TicketDetails() {
 
       // request to create ticket for seat
       const seatRes = await fetch(
-        `http://localhost:8089/tickets/seat/${seatId}/book/${bookingId}`,
+        `https://busticketingsystem-1.onrender.com/tickets/seat/${seatId}/book/${bookingId}`,
         {
           body: JSON.stringify({}),
           headers: {
@@ -121,7 +121,7 @@ export default function TicketDetails() {
 
       // confirm booking
       const confirmRes = await fetch(
-        `http://localhost:8089/bookSeats/${seatId}`,
+        `https://busticketingsystem-1.onrender.com/bookSeats/${seatId}`,
         {
           body: JSON.stringify({}),
           headers: {
@@ -161,7 +161,7 @@ export default function TicketDetails() {
     // const amt = calcTotalCost();
     const tid = generateRandomId();
     const response = await fetch(
-      `http://localhost:8089/secret/generateSignature?total_cost=${totalCost}&transaction_uuid=${tid}`
+      `https://busticketingsystem-1.onrender.com/secret/generateSignature?total_cost=${totalCost}&transaction_uuid=${tid}`
     );
     let sig = "";
     if (response) {
