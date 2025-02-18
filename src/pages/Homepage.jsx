@@ -1,7 +1,6 @@
 import NavigationBar from "../components/Navbar";
 import ImageSearchComponent from "../components/ImageSearchComponent";
 
-// HomePage component
 export default function HomePage() {
   return (
     <div className="flex flex-col h-screen w-screen overflow-auto bg-gray-100">

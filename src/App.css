@@ -1,4 +1,4 @@
-/* BusList */
+BusList
 .bus-list-main {
     display: flex;
     flex-direction: column;
@@ -106,8 +106,7 @@
   }
   
 
-  
-// td
+
 .ticket-details-container {
     display: flex;
     flex-direction: column;

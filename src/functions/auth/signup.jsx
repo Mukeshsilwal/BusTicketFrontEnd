@@ -1,8 +1,6 @@
 import { toast } from "react-toastify";
-// import { getStore, postStore } from "../../config/store";
 import axiosInstance from "..";
 
-//signup By User Data
 export const signupByData = async (data) => {
   try {
     console.log(data);
