@@ -61,5 +61,5 @@ export default BusDetail;
 
 BusDetail.propTypes = {
   route12: PropTypes.any,
-  bus: PropTypes.object.isRequired,
+  bus: PropTypes.any,
 };
