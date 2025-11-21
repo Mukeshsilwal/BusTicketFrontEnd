@@ -1,5 +1,5 @@
 import axios from "axios";
-const singUp="https://busticketingsystem-1.onrender.com/";
+const singUp="http://localhost:8089";
 const axiosInstance = axios.create({
   baseURL: singUp,
 });

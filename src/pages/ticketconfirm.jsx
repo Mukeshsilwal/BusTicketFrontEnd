@@ -2,16 +2,19 @@ import { useEffect, useState } from "react";
 import NavigationBar from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import API_CONFIG from "../config/api";
 
 const TicketConfirmed = () => {
   const [pdfUrl, setPdfUrl] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // automatically fetch ticket PDF on page load
     fetchPdf();
   }, []);
 
+  // ------------------------------
+  // Fetch Ticket PDF
+  // ------------------------------
   async function fetchPdf() {
     const seatResponses = JSON.parse(localStorage.getItem("seatRes")) || [];
     const firstTicket = seatResponses[0];
@@ -23,8 +26,8 @@ const TicketConfirmed = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8089/tickets/generate?ticketId=${firstTicket.ticketNo}`
-      );
+    `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.GENERATE_TICKET}?ticketId=${firstTicket.ticketNo}`
+  );
 
       if (!response.ok) {
         throw new Error("Failed to fetch PDF");
@@ -39,23 +42,31 @@ const TicketConfirmed = () => {
     }
   }
 
+  // ------------------------------
+  // Cancel Ticket
+  // ------------------------------
   async function cancelTicket() {
-    const selectedBus = JSON.parse(localStorage.getItem("busListDetails")).selectedBus;
-    const seatNumber = JSON.parse(localStorage.getItem("selectedSeats"))[0];
-    const seatId = selectedBus.seats.find(
-      (seat) => seat.seatNumber === seatNumber
-    ).id;
+    const selectedBus = JSON.parse(localStorage.getItem("busListDetails"))?.selectedBus;
+    const seatNumber = JSON.parse(localStorage.getItem("selectedSeats"))?.[0];
+    const seatId = selectedBus?.seats.find((seat) => seat.seatNumber === seatNumber)?.id;
     const email = localStorage.getItem("email");
-    const ticketId = JSON.parse(localStorage.getItem("seatRes"))[0].ticketNo;
+    const ticketId = JSON.parse(localStorage.getItem("seatRes"))?.[0]?.ticketNo;
+
+    if (!seatId || !ticketId) {
+      toast.error("Cannot find ticket or seat to cancel.");
+      return;
+    }
 
     try {
-      const response = await fetch(
-        `http://localhost:8089/bookSeats/${seatId}?email=${email}&ticketNo=${ticketId}`,
-        { method: "DELETE" }
+      const response = await ApiService.delete(
+        `${API_CONFIG.ENDPOINTS.BOOK_SEAT}/${seatId}?email=${email}&ticketNo=${ticketId}`
       );
+
       if (response.ok) {
         toast.success("Ticket Cancelled.");
         navigate("/");
+      } else {
+        toast.error("Failed to cancel ticket.");
       }
     } catch (error) {
       console.error("Error cancelling ticket:", error);

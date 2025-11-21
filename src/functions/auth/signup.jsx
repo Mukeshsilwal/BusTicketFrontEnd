@@ -5,7 +5,7 @@ export const signupByData = async (data) => {
   try {
     console.log(data);
     
-    const response = await axiosInstance.post("/auth/create_user", data);
+    const response = await axiosInstance.post("/auth/create-user", data);
     if (response.data) {
       console.log(response.data);
       return response.data;

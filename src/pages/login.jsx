@@ -1,19 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
+import API_CONFIG from "../config/api";
+import apiService from "../services/api.service";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  function handleEmailChange(e) {
-    setEmail(e.target.value);
-  }
-
-  function handlePasswordChange(e) {
-    setPassword(e.target.value);
-  }
+  useEffect(() => {
+    setEmail("");
+    setPassword("");
+  }, []);
 
   async function handleLogin() {
     if (email.length === 0) {
@@ -25,22 +24,28 @@ export default function Login() {
       return;
     }
 
-    const loginUrl = "http://localhost:8089/auth/login";
-    const loginRes = await fetch(loginUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const loginRes = await apiService.post(API_CONFIG.ENDPOINTS.LOGIN, {
+        email,
+        password,
+      });
 
-    if (loginRes.ok) {
-      const data = await loginRes.json();
-      const token = data.token;
-      localStorage.setItem("token", token);
-      navigate("/admin/panel");
-    } else {
-      toast.error("Invalid email or password");
+      if (loginRes.ok) {
+        const data = await loginRes.json();
+        const token = data.token;
+        localStorage.setItem("token", token);
+
+        setEmail("");
+        setPassword("");
+
+        toast.success("Login successful!");
+        navigate("/admin/panel", { replace: true });
+      } else {
+        toast.error("Invalid email or password");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("An error occurred during login");
     }
   }
 
@@ -50,31 +55,43 @@ export default function Login() {
         <h1 className="text-4xl font-bold text-center text-indigo-700 mb-4">
           Log In
         </h1>
-        <form className="space-y-6">
+        <div className="space-y-6">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
               Email
             </label>
             <input
-              type="text"
+              autoComplete="off"
+              type="email"
               id="email"
-              onChange={handleEmailChange}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               name="email"
               className="w-full p-3 mt-1 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-300"
             />
           </div>
+
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700"
+            >
               Password
             </label>
             <input
+              autoComplete="off"
               type="password"
               id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               name="password"
-              onChange={handlePasswordChange}
               className="w-full p-3 mt-1 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-300"
             />
           </div>
+
           <button
             type="button"
             onClick={handleLogin}
@@ -82,19 +99,24 @@ export default function Login() {
           >
             Log In
           </button>
-        </form>
+        </div>
 
         <div className="mt-6 text-sm text-gray-600 text-center">
-          <Link to="/change-password" className="text-indigo-600 font-medium hover:underline">
+          <Link
+            to="/change-password"
+            className="text-indigo-600 font-medium hover:underline"
+          >
             Forget Or Reset Password?
           </Link>
         </div>
-        
-        {/* Sign Up Link */}
+
         <div className="mt-4 text-sm text-gray-600 text-center">
           <p>
             New here?{" "}
-            <Link to="/admin/register" className="text-indigo-600 font-medium hover:underline">
+            <Link
+              to="/admin/register"
+              className="text-indigo-600 font-medium hover:underline"
+            >
               Sign Up
             </Link>
           </p>

@@ -1,30 +1,37 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { signupByData } from "../functions/auth/signup";
 import { useFormik } from "formik";
 import { loginRegisterValidation } from "../validations/auth.validations";
+import API_CONFIG from "../config/api";
+import ApiService from "../services/api.service";
 
 export default function Register() {
+  const navigate = useNavigate();
+
   const initialValues = {
     email: "",
     password: "",
   };
 
-  const { values, errors, touched, handleBlur, handleSubmit, handleChange } =
+  const { values, errors, touched, handleBlur, handleSubmit, handleChange, resetForm } =
     useFormik({
       initialValues,
       validationSchema: loginRegisterValidation,
       onSubmit: async (values, action) => {
-        const { ...data } = values;
         try {
-          const response = await signupByData(data);
-          if (response) {
-            toast.success("User is Signup Success.");
+          const response = await ApiService.post(API_CONFIG.ENDPOINTS.SIGNUP, values);
+          
+          if (response.ok) {
+            toast.success("User signup successful!");
             action.resetForm();
+            
+            setTimeout(() => {
+              navigate("/admin/login", { replace: true });
+            }, 1500);
           } else {
-            console.log(response);
-            toast.error("Signup failed. Please try again.");
+            const errorData = await response.json();
+            toast.error(errorData.message || "Signup failed. Please try again.");
           }
         } catch (error) {
           console.error(error);
@@ -33,9 +40,12 @@ export default function Register() {
       },
     });
 
+  useEffect(() => {
+    resetForm();
+  }, [resetForm]);
+
   return (
     <div className="flex h-screen bg-gradient-to-r from-purple-400 via-pink-500 to-red-500">
-      {/* Left Blank Space with Animation */}
       <div className="hidden lg:flex items-center justify-center flex-1 bg-white text-black rounded-l-lg shadow-2xl p-8 animate-fadeIn">
         <div className="max-w-lg text-center">
           <h1 className="text-3xl font-bold text-gray-800">Welcome to Our Service!</h1>
@@ -52,28 +62,26 @@ export default function Register() {
           <h2 className="text-sm font-medium mb-4 text-gray-600 text-center">
             Your journey starts with a click: Simplifying bus bookings, one ticket at a time.
           </h2>
-          <div className="mt-4 text-sm text-gray-600 text-center">
-            <p>Sign Up with email</p>
-          </div>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Email
               </label>
               <input
-                type="text"
+                type="email"
                 id="email"
                 value={values.email}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 name="email"
+                autoComplete="off"
                 className="mt-1 p-3 w-full border border-gray-300 rounded-md focus:border-purple-500 focus:ring-2 focus:ring-purple-500 transition-colors duration-300 shadow-sm hover:shadow-md"
               />
-              {errors.email && touched.email ? (
-                <span className="font-light text-red-500 mb-2">
+              {errors.email && touched.email && (
+                <span className="block font-light text-red-500 mt-1 text-sm">
                   {errors.email}
                 </span>
-              ) : null}
+              )}
             </div>
 
             <div>
@@ -87,13 +95,14 @@ export default function Register() {
                 value={values.password}
                 onChange={handleChange}
                 onBlur={handleBlur}
+                autoComplete="off"
                 className="mt-1 p-3 w-full border border-gray-300 rounded-md focus:border-purple-500 focus:ring-2 focus:ring-purple-500 transition-colors duration-300 shadow-sm hover:shadow-md"
               />
-              {errors.password && touched.password ? (
-                <span className="font-light text-red-500 mb-2">
+              {errors.password && touched.password && (
+                <span className="block font-light text-red-500 mt-1 text-sm">
                   {errors.password}
                 </span>
-              ) : null}
+              )}
             </div>
             <div>
               <button
@@ -106,7 +115,7 @@ export default function Register() {
           </form>
           <div className="mt-4 text-sm text-gray-600 text-center">
             <p>
-              Already have an account?
+              Already have an account?{" "}
               <Link to="/admin/login" className="text-purple-600 hover:underline">
                 Login here
               </Link>
@@ -117,27 +126,3 @@ export default function Register() {
     </div>
   );
 }
-
-// CSS for animation
-const styles = `
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.animate-fadeIn {
-  animation: fadeIn 0.5s ease-in-out forwards;
-}
-`;
-
-// Inject styles into the document
-const styleSheet = document.createElement("style");
-styleSheet.type = "text/css";
-styleSheet.innerText = styles;
-document.head.appendChild(styleSheet);

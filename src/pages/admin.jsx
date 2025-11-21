@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import NavigationBar from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import ApiService from "../services/api.service";
+import API_CONFIG from "../config/api";
+
 
 export function AdminPanel() {
   const today = new Date().toISOString().split("T")[0];
@@ -32,18 +35,21 @@ export function AdminPanel() {
     }
   }, []);
 
-  // Fetch bus stops
-  async function getBusStops() {
-    const busStopRes = await fetch("http://localhost:8089/busStop/get");
-    if (busStopRes.ok) {
-      const busStops = await busStopRes.json();
-      setBusStops(busStops);
+ async function getBusStops() {
+    try {
+      const busStopRes = await ApiService.get(API_CONFIG.ENDPOINTS.GET_BUS_STOPS);
+      if (busStopRes.ok) {
+        const busStops = await busStopRes.json();
+        setBusStops(busStops);
+      }
+    } catch (error) {
+      console.error("Error fetching bus stops:", error);
     }
   }
 
   // Fetch all routes
   async function getAllRoutes() {
-    const allroutesRes = await fetch("http://localhost:8089/route/get");
+    const allroutesRes = await ApiService.get(API_CONFIG.ENDPOINTS.GET_ROUTES);
     if (allroutesRes.ok) {
       const allRoutesLoad = await allroutesRes.json();
       setAllRoutes(allRoutesLoad);
@@ -52,7 +58,7 @@ export function AdminPanel() {
 
   // Fetch all buses
   async function getAllBuses() {
-    const allBusesRes = await fetch("http://localhost:8089/bus/route");
+    const allBusesRes = await ApiService.get(API_CONFIG.ENDPOINTS.GET_ALL_BUSES);
     if (allBusesRes.ok) {
       const allBusesLoad = await allBusesRes.json();
       setAllBuses(allBusesLoad);
@@ -65,137 +71,142 @@ export function AdminPanel() {
       toast.error("Bus Stop name cannot be empty!");
       return;
     }
-    const url = `http://localhost:8089/admin/post`;
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-      body: JSON.stringify({ name: busStop }),
-    });
 
-    if (res.ok) {
-      toast.success("Bus Stop created!");
-      setBusStop("");
-      getBusStops(); // Refresh bus stops list
-    } else {
-      if (res.status === 401) {
-        alert("Session time out. Login again!");
-        navigate("/admin/login");
+    try {
+      const res = await ApiService.post(API_CONFIG.ENDPOINTS.CREATE_BUS_STOP, {
+        name: busStop,
+      });
+
+      if (res.ok) {
+        toast.success("Bus Stop created!");
+        setBusStop("");
+        getBusStops();
+      } else {
+        if (res.status === 401) {
+          toast.error("Session timeout. Login again!");
+          navigate("/admin/login");
+        } else {
+          toast.error("Error while creating Bus Stop. Please Retry!");
+        }
       }
-      toast.error("Error while creating Bus Stop. Please Retry!");
+    } catch (error) {
+      console.error("Error creating bus stop:", error);
+      toast.error("Failed to create bus stop");
     }
   }
-
   // Create a new route
-  async function createRoute() {
+ async function createRoute() {
     if (!routeCityOne || !routeCityTwo) {
       toast.error("Fill both the routes!");
       return;
     }
 
-    const id = busStops.find((city) => city.name === routeCityOne).id;
-    const id1 = busStops.find((city) => city.name === routeCityTwo).id;
-    const url = `http://localhost:8089/admin/busStopRoute/${id}/${id1}`;
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-      body: JSON.stringify({}),
-    });
+    try {
+      const id = busStops.find((city) => city.name === routeCityOne).id;
+      const id1 = busStops.find((city) => city.name === routeCityTwo).id;
+      
+      const res = await ApiService.post(
+        `${API_CONFIG.ENDPOINTS.CREATE_ROUTE}/${id}/${id1}`,
+        {}
+      );
 
-    if (res.ok) {
-      toast.success("New Route created!");
-      setRouteCityOne("");
-      setRouteCityTwo("");
-      getAllRoutes(); // Refresh routes list
-    } else {
-      if (res.status === 401) {
-        alert("Session time out. Login again!");
-        navigate("/admin/login");
+      if (res.ok) {
+        toast.success("New Route created!");
+        setRouteCityOne("");
+        setRouteCityTwo("");
+        getAllRoutes();
+      } else {
+        if (res.status === 401) {
+          toast.error("Session timeout. Login again!");
+          navigate("/admin/login");
+        } else {
+          toast.error("Error while creating new route. Please Retry!");
+        }
       }
-      toast.error("Error while creating new route. Please Retry!");
+    } catch (error) {
+      console.error("Error creating route:", error);
+      toast.error("Failed to create route");
     }
   }
 
   // Create a new bus
-  async function createNewBus() {
+ async function createNewBus() {
     if (!busName || !busRoute || !busDate || !maxPrice || !basePrice || !busTime) {
       toast.error("All fields are required!");
       return;
     }
 
-    const url = `http://localhost:8089/admin/routeBus/${busRoute}`;
-    const busRouteRes = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-      body: JSON.stringify({
-        busName,
-        busType: "Deluxe",
-        departureDateTime: `${busDate}T${busTime}`,
-        date: busDate,
-        maxPrice,
-        basePrice,
-      }),
-    });
+    try {
+      const busRouteRes = await ApiService.post(
+        `${API_CONFIG.ENDPOINTS.CREATE_BUS}/${busRoute}`,
+        {
+          busName,
+          busType: "Deluxe",
+          departureDateTime: `${busDate}T${busTime}`,
+          date: busDate,
+          maxPrice,
+          basePrice,
+        }
+      );
 
-    if (busRouteRes.ok) {
-      toast.success("New Bus created!");
-      setBusName("");
-      setBusRoute("");
-      setBusDate("");
-      setMaxPrice("");
-      setBasePrice("");
-      setBusTime("");
-      getAllBuses(); // Refresh buses list
-    } else {
-      if (busRouteRes.status === 401) {
-        alert("Session time out. Login again!");
-        navigate("/admin/login");
+      if (busRouteRes.ok) {
+        toast.success("New Bus created!");
+        setBusName("");
+        setBusRoute("");
+        setBusDate("");
+        setMaxPrice("");
+        setBasePrice("");
+        setBusTime("");
+        getAllBuses();
+      } else {
+        if (busRouteRes.status === 401) {
+          toast.error("Session timeout. Login again!");
+          navigate("/admin/login");
+        } else {
+          toast.error("Error while creating new bus. Please Retry!");
+        }
       }
-      toast.error("Error while creating new bus. Please Retry!");
+    } catch (error) {
+      console.error("Error creating bus:", error);
+      toast.error("Failed to create bus");
     }
   }
 
   // Create a new seat
-  async function createNewSeat() {
+   async function createNewSeat() {
     if (!seatNumber || !seatBusId) {
       toast.error("Seat Number and Bus ID are required!");
       return;
     }
 
-    const url = `http://localhost:8089/admin/postSeat/${seatBusId}`;
-    const seatRes = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-      body: JSON.stringify({
-        seatNumber,
-        reserved: false,
-      }),
-    });
+    try {
+      const seatRes = await ApiService.post(
+        `${API_CONFIG.ENDPOINTS.CREATE_SEAT}/${seatBusId}`,
+        {
+          seatNumber,
+          reserved: false,
+        }
+      );
 
-    if (seatRes.ok) {
-      toast.success("New Seat added!");
-      setSeatNumber("");
-      setSeatBusId("");
-      getAllBuses(); // Refresh buses list
-    } else {
-      if (seatRes.status === 401) {
-        alert("Session time out. Login again!");
-        navigate("/admin/login");
+      if (seatRes.ok) {
+        toast.success("New Seat added!");
+        setSeatNumber("");
+        setSeatBusId("");
+        getAllBuses();
+      } else {
+        if (seatRes.status === 401) {
+          toast.error("Session timeout. Login again!");
+          navigate("/admin/login");
+        } else {
+          toast.error("Error while creating new seat. Please Retry!");
+        }
       }
-      toast.error("Error while creating new seat. Please Retry!");
+    } catch (error) {
+      console.error("Error creating seat:", error);
+      toast.error("Failed to create seat");
     }
   }
+
 
   return (
     <div className="min-h-screen bg-gray-100">
