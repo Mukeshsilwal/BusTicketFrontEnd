@@ -7,19 +7,20 @@ export default function ChangePassword() {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [otp, setOtp] = useState(""); 
+  const [otp, setOtp] = useState("");
   const [otpModalVisible, setOtpModalVisible] = useState(false);
+
   const navigate = useNavigate();
 
-  const handleEmailChange = (e) => setEmail(e.target.value);
-  const handleOldPasswordChange = (e) => setOldPassword(e.target.value);
-  const handleNewPasswordChange = (e) => setNewPassword(e.target.value);
-  const handleConfirmPasswordChange = (e) => setConfirmPassword(e.target.value);
-  const handleOtpChange = (e) => setOtp(e.target.value);
+  const handleSendOtp = async () => {
+    if (!email) {
+      toast.error("Please enter email");
+      return;
+    }
 
-  async function handleSendOtp() {
-    const sendOtpUrl = "http://localhost:8089/auth/sent-otp"; 
+    const sendOtpUrl = "http://localhost:8089/auth/sent-otp";
     const token = localStorage.getItem("token");
+
     const response = await fetch(sendOtpUrl, {
       method: "POST",
       headers: {
@@ -30,35 +31,41 @@ export default function ChangePassword() {
     });
 
     if (response.ok) {
-      toast.success("OTP sent to your email");
-      setOtpModalVisible(true); 
+      toast.success("OTP sent");
+      setOtpModalVisible(true);
     } else {
       const errorData = await response.json();
-      toast.error(errorData.message || "Failed to send OTP");
+      toast.error(errorData.message || "OTP sending failed");
     }
-  }
+  };
 
-  async function handleChangePassword() {
+  const handleChangePassword = async () => {
     if (newPassword !== confirmPassword) {
       toast.error("New passwords do not match");
       return;
     }
 
-    const changePasswordUrl = "http://localhost:8089/auth/change-password";
+    // Determine mode: CHANGE_PASSWORD or RESET_PASSWORD
+    const resetPasswordMode = oldPassword
+      ? "CHANGE_PASSWORD"
+      : "RESET_PASSWORD";
+
+    const url = "http://localhost:8089/auth/change-password";
     const token = localStorage.getItem("token");
 
-    const response = await fetch(changePasswordUrl, {
+    const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
+        resetPassword: resetPasswordMode,
         username: email,
         oldPassword,
         newPassword,
         confirmPassword,
-        otp, 
+        otp,
       }),
     });
 
@@ -67,13 +74,13 @@ export default function ChangePassword() {
       navigate("/admin/login");
     } else {
       const errorData = await response.json();
-      toast.error(errorData.message );
+      toast.error(errorData.message);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-500 to-indigo-700 flex items-center justify-center">
-      <div className="w-full max-w-md bg-white shadow-lg rounded-lg p-8 transform transition duration-500 hover:shadow-2xl">
+      <div className="w-full max-w-md bg-white shadow-lg rounded-lg p-8">
         <h2 className="text-2xl font-bold text-center text-indigo-700 mb-4">
           Change Password
         </h2>
@@ -83,61 +90,81 @@ export default function ChangePassword() {
             type="text"
             placeholder="Email"
             value={email}
-            onChange={handleEmailChange}
-            className="w-full p-3 mt-1 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-300"
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full p-3 border rounded-md"
           />
+
+          {/* Show old password only if user wants normal change */}
           <input
             type="password"
-            placeholder="Old Password"
+            placeholder="Old Password (leave empty if forgot)"
             value={oldPassword}
-            onChange={handleOldPasswordChange}
-            className="w-full p-3 mt-1 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-300"
+            onChange={(e) => setOldPassword(e.target.value)}
+            className="w-full p-3 border rounded-md"
           />
+
           <input
             type="password"
             placeholder="New Password"
             value={newPassword}
-            onChange={handleNewPasswordChange}
-            className="w-full p-3 mt-1 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-300"
+            onChange={(e) => setNewPassword(e.target.value)}
+            className="w-full p-3 border rounded-md"
           />
+
           <input
             type="password"
             placeholder="Confirm New Password"
             value={confirmPassword}
-            onChange={handleConfirmPasswordChange}
-            className="w-full p-3 mt-1 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-300"
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            className="w-full p-3 border rounded-md"
           />
 
-          <button
-            type="button"
-            onClick={handleSendOtp}
-            className="w-full bg-blue-600 text-white p-3 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300"
-          >
-            Send OTP
-          </button>
+          {/* If old password empty → user wants RESET mode → show Send OTP */}
+          {!oldPassword && (
+            <button
+              type="button"
+              onClick={handleSendOtp}
+              className="w-full bg-blue-600 text-white p-3 rounded-md"
+            >
+              Send OTP
+            </button>
+          )}
+
+          {/* If old password entered → directly change without OTP */}
+          {oldPassword && (
+            <button
+              type="button"
+              onClick={handleChangePassword}
+              className="w-full bg-green-600 text-white p-3 rounded-md"
+            >
+              Change Password
+            </button>
+          )}
         </form>
       </div>
 
+      {/* OTP modal for RESET PASSWORD */}
       {otpModalVisible && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h3 className="text-xl font-semibold text-center mb-4">Enter OTP</h3>
+            <h3 className="text-lg font-semibold text-center mb-2">Enter OTP</h3>
+
             <input
               type="text"
               placeholder="OTP"
               value={otp}
-              onChange={handleOtpChange}
-              className="w-full p-3 mt-1 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-300"
+              onChange={(e) => setOtp(e.target.value)}
+              className="w-full p-3 border rounded-md"
             />
+
             <button
-              type="button"
               onClick={() => {
-                setOtpModalVisible(false); 
-                handleChangePassword(); 
+                setOtpModalVisible(false);
+                handleChangePassword();
               }}
-              className="w-full mt-4 bg-green-600 text-white p-3 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-300"
+              className="w-full mt-3 bg-green-600 text-white p-3 rounded-md"
             >
-              Change Password
+              Verify OTP & Change Password
             </button>
           </div>
         </div>
