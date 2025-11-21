@@ -7,23 +7,35 @@ const TicketConfirmed = () => {
   const [pdfUrl, setPdfUrl] = useState(null);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    // automatically fetch ticket PDF on page load
+    fetchPdf();
+  }, []);
+
   async function fetchPdf() {
-    const ticketId = JSON.parse(localStorage.getItem("seatRes"));
-    console.log(ticketId);
+    const seatResponses = JSON.parse(localStorage.getItem("seatRes")) || [];
+    const firstTicket = seatResponses[0];
+
+    if (!firstTicket) {
+      toast.error("No ticket found!");
+      return;
+    }
+
     try {
       const response = await fetch(
-        "https://busticketingsystem-1.onrender.com/tickets/generate?ticketId=" + ticketId.ticketNo
+        `http://localhost:8089/tickets/generate?ticketId=${firstTicket.ticketNo}`
       );
+
       if (!response.ok) {
         throw new Error("Failed to fetch PDF");
       }
+
       const blob = await response.blob();
-      console.log(blob);
       const url = URL.createObjectURL(blob);
-      console.log(url);
       setPdfUrl(url);
     } catch (error) {
       console.error("Error fetching PDF:", error);
+      toast.error("Failed to load ticket PDF.");
     }
   }
 
@@ -34,21 +46,20 @@ const TicketConfirmed = () => {
       (seat) => seat.seatNumber === seatNumber
     ).id;
     const email = localStorage.getItem("email");
-    const ticketId = JSON.parse(localStorage.getItem("seatRes")).ticketNo;
-    console.log(seatId);
+    const ticketId = JSON.parse(localStorage.getItem("seatRes"))[0].ticketNo;
+
     try {
       const response = await fetch(
-        `https://busticketingsystem-1.onrender.com/bookSeats/${seatId}?email=${email}&ticketNo=${ticketId}`,
-        {
-          method: "DELETE",
-        }
+        `http://localhost:8089/bookSeats/${seatId}?email=${email}&ticketNo=${ticketId}`,
+        { method: "DELETE" }
       );
       if (response.ok) {
         toast.success("Ticket Cancelled.");
         navigate("/");
       }
     } catch (error) {
-      console.error("Error fetching PDF:", error);
+      console.error("Error cancelling ticket:", error);
+      toast.error("Failed to cancel ticket.");
     }
   }
 
@@ -57,23 +68,32 @@ const TicketConfirmed = () => {
       <NavigationBar />
 
       <div style={{ width: "100%", height: "500px", marginTop: "3em" }}>
-        {!pdfUrl && (
-          <button onClick={fetchPdf} className="pagination-btn">
-            View Ticket
-          </button>
-        )}
-        {pdfUrl && (
-          <button onClick={cancelTicket} className="pagination-btn">
-            Cancel Ticket
-          </button>
-        )}
-        {pdfUrl && (
-          <embed
-            src={pdfUrl}
-            type="application/pdf"
-            width="100%"
-            height="100%"
-          />
+        {pdfUrl ? (
+          <>
+            <embed
+              src={pdfUrl}
+              type="application/pdf"
+              width="100%"
+              height="100%"
+            />
+            <div className="flex justify-center mt-4 gap-4">
+              <a
+                href={pdfUrl}
+                download="ticket.pdf"
+                className="pagination-btn bg-green-600 text-white px-4 py-2 rounded"
+              >
+                Download Ticket
+              </a>
+              <button
+                onClick={cancelTicket}
+                className="pagination-btn bg-red-600 text-white px-4 py-2 rounded"
+              >
+                Cancel Ticket
+              </button>
+            </div>
+          </>
+        ) : (
+          <p>Loading ticket...</p>
         )}
       </div>
     </div>

@@ -1,6 +1,6 @@
 import { createContext, useState } from "react";
 
-const SelectedBusContext = createContext(null);
+const SelectedBusContext = createContext([]);
 
 export function SelectedBusProvider({ children }) {
   const [selectedBus, setSelectedBus] = useState(null);

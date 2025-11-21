@@ -34,7 +34,7 @@ export function AdminPanel() {
 
   // Fetch bus stops
   async function getBusStops() {
-    const busStopRes = await fetch("https://busticketingsystem-1.onrender.com/busStop/get");
+    const busStopRes = await fetch("http://localhost:8089/busStop/get");
     if (busStopRes.ok) {
       const busStops = await busStopRes.json();
       setBusStops(busStops);
@@ -43,7 +43,7 @@ export function AdminPanel() {
 
   // Fetch all routes
   async function getAllRoutes() {
-    const allroutesRes = await fetch("https://busticketingsystem-1.onrender.com/route/get");
+    const allroutesRes = await fetch("http://localhost:8089/route/get");
     if (allroutesRes.ok) {
       const allRoutesLoad = await allroutesRes.json();
       setAllRoutes(allRoutesLoad);
@@ -52,7 +52,7 @@ export function AdminPanel() {
 
   // Fetch all buses
   async function getAllBuses() {
-    const allBusesRes = await fetch("https://busticketingsystem-1.onrender.com/bus/route");
+    const allBusesRes = await fetch("http://localhost:8089/bus/route");
     if (allBusesRes.ok) {
       const allBusesLoad = await allBusesRes.json();
       setAllBuses(allBusesLoad);
@@ -65,7 +65,7 @@ export function AdminPanel() {
       toast.error("Bus Stop name cannot be empty!");
       return;
     }
-    const url = `https://busticketingsystem-1.onrender.com/admin/post`;
+    const url = `http://localhost:8089/admin/post`;
     const res = await fetch(url, {
       method: "POST",
       headers: {
@@ -97,7 +97,7 @@ export function AdminPanel() {
 
     const id = busStops.find((city) => city.name === routeCityOne).id;
     const id1 = busStops.find((city) => city.name === routeCityTwo).id;
-    const url = `https://busticketingsystem-1.onrender.com/admin/busStopRoute/${id}/${id1}`;
+    const url = `http://localhost:8089/admin/busStopRoute/${id}/${id1}`;
     const res = await fetch(url, {
       method: "POST",
       headers: {
@@ -128,7 +128,7 @@ export function AdminPanel() {
       return;
     }
 
-    const url = `https://busticketingsystem-1.onrender.com/admin/routeBus/${busRoute}`;
+    const url = `http://localhost:8089/admin/routeBus/${busRoute}`;
     const busRouteRes = await fetch(url, {
       method: "POST",
       headers: {
@@ -170,7 +170,7 @@ export function AdminPanel() {
       return;
     }
 
-    const url = `https://busticketingsystem-1.onrender.com/admin/postSeat/${seatBusId}`;
+    const url = `http://localhost:8089/admin/postSeat/${seatBusId}`;
     const seatRes = await fetch(url, {
       method: "POST",
       headers: {

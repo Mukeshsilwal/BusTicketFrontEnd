@@ -25,7 +25,7 @@ export default function Login() {
       return;
     }
 
-    const loginUrl = "https://busticketingsystem-1.onrender.com/auth/login";
+    const loginUrl = "http://localhost:8089/auth/login";
     const loginRes = await fetch(loginUrl, {
       method: "POST",
       headers: {

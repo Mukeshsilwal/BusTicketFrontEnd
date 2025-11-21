@@ -18,7 +18,7 @@ export default function ChangePassword() {
   const handleOtpChange = (e) => setOtp(e.target.value);
 
   async function handleSendOtp() {
-    const sendOtpUrl = "https://busticketingsystem-1.onrender.com/auth/sent-otp"; 
+    const sendOtpUrl = "http://localhost:8089/auth/sent-otp"; 
     const token = localStorage.getItem("token");
     const response = await fetch(sendOtpUrl, {
       method: "POST",
@@ -44,7 +44,7 @@ export default function ChangePassword() {
       return;
     }
 
-    const changePasswordUrl = "https://busticketingsystem-1.onrender.com/auth/change-password";
+    const changePasswordUrl = "http://localhost:8089/auth/change-password";
     const token = localStorage.getItem("token");
 
     const response = await fetch(changePasswordUrl, {
