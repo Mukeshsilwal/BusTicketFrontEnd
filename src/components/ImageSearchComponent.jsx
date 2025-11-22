@@ -20,7 +20,7 @@ const ImageSearchComponent = () => {
   const handleSearch = async () => {
     try {
      const res = await ApiService.get(
-    `${API_CONFIG.ENDPOINTS.SEARCH_BUS}?source=${source}&destination=${destination}&date=${date}`
+    `${API_CONFIG.ENDPOINTS.SEARCH_BUSES}?source=${source}&destination=${destination}&date=${date}`
 );
 
 const response = await res.json();  // <-- REQUIRED
