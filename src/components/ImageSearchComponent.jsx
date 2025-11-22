@@ -1,9 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axiosInstance from "../functions";
 import BusListContext from "../context/busdetails";
 import Apiservice from "../services/api.service";
-import API_CONFIG from "../config/api.config";
+import API_CONFIG from "../config/api";
 
 const ImageSearchComponent = () => {
   const navigate = useNavigate();
@@ -16,7 +15,6 @@ const ImageSearchComponent = () => {
 
   const today = new Date().toISOString().split("T")[0];
 
-  // ⭐ Search buses using API service
   const handleSearch = async () => {
     try {
       const response = await Apiservice.get(
