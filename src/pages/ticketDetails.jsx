@@ -5,9 +5,11 @@ import API_CONFIG from "../config/api";
 import ApiService from "../services/api.service";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import "./SeatSelection.css";
 
 export default function TicketDetails() {
   const { selectedBus } = useContext(SelectedBusContext);
+
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -16,29 +18,38 @@ export default function TicketDetails() {
 
   const navigate = useNavigate();
 
+  // -----------------------------------
+  // CALCULATE TOTAL COST
+  // -----------------------------------
   useEffect(() => {
-    const total = selectedSeats.reduce((acc, seatNum) => {
+    if (!selectedBus?.seats) return;
+
+    const total = selectedSeats.reduce((sum, seatNum) => {
       const seat = selectedBus.seats.find((s) => s.seatNumber === seatNum);
-      return acc + (seat ? parseInt(seat.price) : 0);
+      return sum + (seat ? Number(seat.price) : 0);
     }, 0);
 
     setTotalCost(total);
-  }, [selectedSeats, selectedBus.seats]);
+  }, [selectedSeats, selectedBus]);
 
+  // -----------------------------------
+  // GENERATE RANDOM TRANSACTION ID
+  // -----------------------------------
   function generateRandomId() {
-    return Array.from({ length: 10 }, () =>
-      Math.floor(Math.random() * 10)
-    ).join("");
+    return Array.from({ length: 10 }, () => Math.floor(Math.random() * 10)).join("");
   }
 
-  async function esewaPaymentCall(sig, tid, bookingId) {
+  // -----------------------------------
+  // ESEWA PAYMENT FORM SUBMIT
+  // -----------------------------------
+  async function esewaPaymentCall(signature, tid, bookingId) {
     const formData = {
       amount: totalCost,
       failure_url: "http://localhost:3000/booking-failed",
       product_delivery_charge: "0",
       product_service_charge: "0",
       product_code: "EPAYTEST",
-      signature: sig,
+      signature: signature,
       signed_field_names: "total_amount,transaction_uuid,product_code",
       success_url: "http://localhost:3000/ticket-confirm",
       tax_amount: "0",
@@ -47,6 +58,7 @@ export default function TicketDetails() {
       secret: "8gBm/:&EnhH.1/q",
     };
 
+    // Prepare form
     const form = document.createElement("form");
     form.method = "POST";
     form.action = "https://rc-epay.esewa.com.np/api/epay/main/v2/form";
@@ -61,97 +73,101 @@ export default function TicketDetails() {
 
     document.body.appendChild(form);
 
-    // ------------------------------
-    // BOOK SEATS (uses ApiService)
-    // ------------------------------
+    // -------------------------
+    // BOOK SEATS
+    // -------------------------
     const seatResponses = [];
-    const bookedSeats = [];
+    const bookedSeatNumbers = [];
 
     for (const seatNum of selectedSeats) {
       const seat = selectedBus.seats.find((s) => s.seatNumber === seatNum);
       if (!seat) continue;
 
       try {
-        // save booking seat
-        const seatRes = await ApiService.post(
+        // Save ticket booking
+        const res = await ApiService.post(
           `${API_CONFIG.ENDPOINTS.BOOK_TICKET}/${seat.id}/book/${bookingId}`,
           {}
         );
 
-        if (seatRes.ok) {
-          const data = await seatRes.json();
+        if (res.ok) {
+          const data = await res.json();
           seatResponses.push(data);
-          bookedSeats.push(seatNum);
+          bookedSeatNumbers.push(seat.seatNumber);
         }
 
-        // confirm seat booking
-        await ApiService.post(
-          `${API_CONFIG.ENDPOINTS.BOOK_SEAT}/${seat.id}`,
-          {}
-        );
+        // Confirm seat
+        await ApiService.post(`${API_CONFIG.ENDPOINTS.BOOK_SEAT}/${seat.id}`, {});
       } catch (err) {
         console.error("Seat booking error:", err);
       }
     }
 
+    // Store responses
     localStorage.setItem("seatRes", JSON.stringify(seatResponses));
-    localStorage.setItem("selectedSeats", JSON.stringify(bookedSeats));
+    localStorage.setItem("selectedSeats", JSON.stringify(bookedSeatNumbers));
+    localStorage.setItem("email", email);
 
+    // Submit form (redirect to eSewa)
     form.submit();
   }
 
+  // -----------------------------------
+  // BOOK TICKET MAIN FUNCTION
+  // -----------------------------------
   async function bookTicket() {
     if (!selectedSeats.length) return toast.error("No seat selected!");
     if (!name) return toast.error("Enter passenger name!");
-    if (!email) return toast.error("Enter passenger email!");
-    if (!contact) return toast.error("Enter passenger contact number!");
+    if (!email) return toast.error("Enter email!");
+    if (!contact) return toast.error("Enter phone number!");
 
     const tid = generateRandomId();
 
-    // ------------------------------
-    // CREATE BOOKING
-    // ------------------------------
+    // 1️⃣ Create booking
     let bookingId = "";
     try {
-      const bookingRes = await ApiService.post(
-        API_CONFIG.ENDPOINTS.CREATE_BOOKING,
-        { fullName: name, email }
-      );
+      const bookingRes = await ApiService.post(API_CONFIG.ENDPOINTS.CREATE_BOOKING, {
+        fullName: name,
+        email,
+      });
 
-      if (!bookingRes.ok) {
-        toast.error("Failed to create booking!");
-        return;
-      }
+      if (!bookingRes.ok) return toast.error("Failed to create booking!");
 
       const data = await bookingRes.json();
       bookingId = data.bookingId;
 
       localStorage.setItem("bookingRes", JSON.stringify(data));
     } catch (err) {
-      toast.error("Booking API error!");
+      toast.error("Error calling booking API.");
       return;
     }
 
-    // ------------------------------
-    // GET SIGNATURE FOR ESEWA
-    // ------------------------------
+    // 2️⃣ Get eSewa signature
     try {
       const sigRes = await ApiService.get(
         `${API_CONFIG.ENDPOINTS.GENERATE_SIGNATURE}?total_cost=${totalCost}&transaction_uuid=${tid}`
       );
 
-      if (!sigRes.ok) {
-        toast.error("Failed to generate eSewa signature!");
-        return;
-      }
+      if (!sigRes.ok) return toast.error("Failed to generate signature");
 
       const signature = await sigRes.text();
-      localStorage.setItem("email", email);
 
+      // 3️⃣ Submit to eSewa
       await esewaPaymentCall(signature, tid, bookingId);
     } catch (err) {
       toast.error("Signature API error!");
     }
+  }
+
+  // -----------------------------------
+  // SEAT AVAILABILITY LOGIC (FIXED)
+  // -----------------------------------
+  function isSeatReserved(seat) {
+    return (
+      seat.reserved === true ||
+      seat.status === "BOOKED" ||
+      seat.isBooked === true
+    );
   }
 
   return (
@@ -183,18 +199,20 @@ export default function TicketDetails() {
 
           <div className="seat-selection-div">
             <div className="seat-selection">
-              {selectedBus.seats.map((seat) => {
+              {selectedBus?.seats?.map((seat) => {
+                const reserved = isSeatReserved(seat);
                 const isSelected = selectedSeats.includes(seat.seatNumber);
-                const isAvailable = !seat.reserved;
 
                 return (
                   <div
                     key={seat.id}
-                    className={`seat${
-                      isSelected ? " selected" : ""
-                    }${isAvailable ? " available" : ""}`}
+                    className={`seat 
+                      ${reserved ? "booked" : "available"} 
+                      ${isSelected ? "selected" : ""}
+                    `}
                     onClick={() => {
-                      if (!isAvailable) return;
+                      if (reserved) return;
+
                       if (!isSelected) {
                         setSelectedSeats([...selectedSeats, seat.seatNumber]);
                       } else {
@@ -205,8 +223,7 @@ export default function TicketDetails() {
                     }}
                   >
                     {seat.seatNumber}
-                    <br />
-                    {isAvailable && <span>{seat.price}</span>}
+                    {!reserved && <div>{seat.price}</div>}
                   </div>
                 );
               })}
@@ -215,8 +232,12 @@ export default function TicketDetails() {
             <div className="seat-info">
               <label>Available</label>
               <div className="seat available"></div>
+
               <label>Booked</label>
-              <div className="seat"></div>
+              <div className="seat booked"></div>
+
+              <label>Selected</label>
+              <div className="seat selected"></div>
             </div>
           </div>
 
@@ -225,24 +246,20 @@ export default function TicketDetails() {
 
         <div className="right-details">
           <h2>Route Details</h2>
+
           <div className="route-details">
             <p>
-              Route: {selectedBus.route12?.sourceBusStop?.name} –{" "}
+              Route: {selectedBus.route12?.sourceBusStop?.name} →{" "}
               {selectedBus.route12?.destinationBusStop?.name}
             </p>
-
-            <p>
-              Date:{" "}
-              {new Date(selectedBus.departureDateTime).toLocaleDateString()}
-            </p>
-
+            <p>Date: {new Date(selectedBus.departureDateTime).toLocaleDateString()}</p>
             <p>Seats: {selectedSeats.join(", ")}</p>
             <p>Bus: {selectedBus.busName}</p>
           </div>
 
           <h2>Payment Details</h2>
           <div className="payment-details">
-            <p>Total Cost: {totalCost}</p>
+            <p>Total Cost: NPR {totalCost}</p>
           </div>
         </div>
       </div>
