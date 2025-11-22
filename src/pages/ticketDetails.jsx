@@ -5,7 +5,7 @@ import API_CONFIG from "../config/api";
 import ApiService from "../services/api.service";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import "./SeatSelection.css";
+import  "./SeatSelection.css";
 
 export default function TicketDetails() {
   const { selectedBus } = useContext(SelectedBusContext);
