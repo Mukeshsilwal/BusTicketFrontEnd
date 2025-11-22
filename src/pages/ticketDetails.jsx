@@ -45,13 +45,13 @@ export default function TicketDetails() {
   async function esewaPaymentCall(signature, tid, bookingId) {
     const formData = {
       amount: totalCost,
-      failure_url: "http://localhost:3000/booking-failed",
+      failure_url: "https://busbookingsystem-mu.vercel.app/booking-failed",
       product_delivery_charge: "0",
       product_service_charge: "0",
       product_code: "EPAYTEST",
       signature: signature,
       signed_field_names: "total_amount,transaction_uuid,product_code",
-      success_url: "http://localhost:3000/ticket-confirm",
+      success_url: "https://busbookingsystem-mu.vercel.app/ticket-confirm",
       tax_amount: "0",
       total_amount: totalCost,
       transaction_uuid: tid,
