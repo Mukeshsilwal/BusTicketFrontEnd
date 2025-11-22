@@ -19,24 +19,24 @@ const ImageSearchComponent = () => {
 
   const handleSearch = async () => {
     try {
-      const response = await ApiService.get(
-        `${API_CONFIG.ENDPOINTS.SEARCH_BUSES}?source=${source}&destination=${destination}&date=${date}`
-      );
+     const res = await ApiService.get(
+    `${API_CONFIG.ENDPOINTS.SEARCH_BUS}?source=${source}&destination=${destination}&date=${date}`
+);
 
-      if (response.data) {
-        localStorage.setItem(
-          "searchDetails",
-          JSON.stringify({ source, destination, date })
-        );
+const response = await res.json();  // <-- REQUIRED
 
-        localStorage.setItem(
-          "busListDetails",
-          JSON.stringify({ busList: response.data })
-        );
+if (response) {
+    localStorage.setItem("searchDetails", JSON.stringify({ source, destination, date }));
 
-        setBusList(response.data);
-        navigate("/buslist");
-      }
+    localStorage.setItem(
+      "busListDetails",
+      JSON.stringify({ busList: response })
+    );
+
+    setBusList(response);
+    navigate("/buslist");
+}
+
     } catch (error) {
       console.error("Search failed:", error);
     }
